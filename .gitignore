@@ -1,0 +1,6 @@
+nbproject/
+target/
+
+*.svg
+*.class
+
