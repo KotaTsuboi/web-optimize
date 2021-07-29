@@ -1,16 +1,20 @@
 package jp.ac.u_tokyo.iis.space.web.optimize;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Enumeration;
 import jp.ac.u_tokyo.iis.space.optimization.algorithm.SimplexMethod;
-import jp.ac.u_tokyo.iis.space.optimization.constraint.EquationSymbol;
+import jp.ac.u_tokyo.iis.space.optimization.boundary.NonnegativeCondition;
 import jp.ac.u_tokyo.iis.space.optimization.constraint.LinearConstraint;
-import jp.ac.u_tokyo.iis.space.optimization.constraint.LinearEquation;
+import jp.ac.u_tokyo.iis.space.optimization.equation.EquationSymbol;
+import jp.ac.u_tokyo.iis.space.optimization.equation.LinearEquation;
+import jp.ac.u_tokyo.iis.space.optimization.exception.UnboundedException;
+import jp.ac.u_tokyo.iis.space.optimization.exception.UnfeasibleException;
 import jp.ac.u_tokyo.iis.space.optimization.function.LinearFunction;
 import jp.ac.u_tokyo.iis.space.optimization.problem.LinearProgrammingProblem;
 import jp.ac.u_tokyo.iis.space.optimization.solution.AbstractContinuousSolution;
@@ -36,6 +40,17 @@ public class CalculationServlet extends HttpServlet {
         int n = 0;
         int m = 0;
 
+        boolean isMaximize;
+        String type = request.getParameter("type");
+
+        if (type.equals("maximize")) {
+            isMaximize = true;
+        } else if (type.equals("minimize")) {
+            isMaximize = false;
+        } else {
+            throw new IllegalArgumentException("Type " + type + " is undefined.");
+        }
+
         while (paramNames.hasMoreElements()) {
             String paramName = paramNames.nextElement();
             if (paramName.contains("cost")) {
@@ -45,53 +60,93 @@ public class CalculationServlet extends HttpServlet {
             }
         }
 
-        double[] costs = new double[n];
+        try {
+            double[] costs = new double[n];
 
-        for (int j = 0; j < n; j++) {
-            costs[j] = Double.parseDouble(request.getParameter("cost" + j));
-        }
-
-        LinearEquation[] equations = new LinearEquation[m];
-
-        for (int i = 0; i < m; i++) {
-            double[] coeff = new double[n];
             for (int j = 0; j < n; j++) {
-                coeff[j] = Double.parseDouble(request.getParameter(("coeff" + i) + j));
+                costs[j] = Double.parseDouble(request.getParameter("cost" + j));
             }
-            EquationSymbol symbol = EquationSymbol.parse(request.getParameter("symbol" + i));
-            double constant = Double.parseDouble(request.getParameter("const" + i));
-            equations[i] = new LinearEquation(coeff, symbol, constant);
-        }
 
-        LinearFunction linearFunction = new LinearFunction(costs);
-        LinearEquation[] linearEquations = equations;
-        boolean[] nonnegative = new boolean[n];
+            LinearEquation[] equations = new LinearEquation[m];
 
-        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+                double[] coeff = new double[n];
+                for (int j = 0; j < n; j++) {
+                    coeff[j] = Double.parseDouble(request.getParameter(("coeff" + i) + j));
+                }
+                EquationSymbol symbol = EquationSymbol.parse(request.getParameter("symbol" + i));
+                double constant = Double.parseDouble(request.getParameter("const" + i));
+                equations[i] = new LinearEquation(coeff, symbol, constant);
+            }
+
+            LinearFunction linearFunction = new LinearFunction(costs);
+            LinearEquation[] linearEquations = equations;
             String[] isNonnegatives = request.getParameterValues("isNonnegative");
-            for (String isNonnegative : isNonnegatives) {
-                if (isNonnegative.equals(String.valueOf(j))) {
-                    nonnegative[j] = true;
+            ArrayList<Integer> variableIndexList = new ArrayList<>();
+
+            if (isNonnegatives != null) {
+                for (int j = 0; j < n; j++) {
+                    for (String isNonnegative : isNonnegatives) {
+                        if (isNonnegative.equals(String.valueOf(j))) {
+                            variableIndexList.add(j);
+                        }
+                    }
                 }
             }
-        }
 
-        LinearConstraint linearConstraint = new LinearConstraint(linearEquations, nonnegative);
-        LinearProgrammingProblem standardForm = new LinearProgrammingProblem(true, linearFunction, linearConstraint);
-        SimplexMethod instance = new SimplexMethod(standardForm);
-        AbstractContinuousSolution solution = instance.run();
+            int[] variableIndexes = new int[variableIndexList.size()];
 
-        response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
+            for (int i = 0; i < variableIndexList.size(); i++) {
+                variableIndexes[i] = variableIndexList.get(i);
+            }
+
+            NonnegativeCondition boundary = new NonnegativeCondition(variableIndexes);
+
+            LinearConstraint linearConstraint = new LinearConstraint(linearEquations);
+            LinearProgrammingProblem standardForm = new LinearProgrammingProblem(isMaximize, linearFunction, linearConstraint, boundary);
+            System.out.println((standardForm.toStandardForm().toString()));
+            SimplexMethod instance = new SimplexMethod(standardForm);
+            AbstractContinuousSolution solution;
+
+            response.setContentType("text/html;charset=UTF-8");
+
+            PrintWriter out = response.getWriter();
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet CalculationServlet</title>");
+            out.println("<link rel=\"stylesheet\" href=\"style.css\"/>");
+            out.println("<script type=\"text/javascript\" async");
+            out.println("src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML\">");
+            out.println("</script>");
+            out.println("<meta name=\"viewport\" content=\"width=device-width,user-scalable=no,maximum-scale=1\"/>");
+            out.println("<title>Web-Optimize</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println(solution.toString());
-            out.println("</body>");
-            out.println("</html>");
+            out.println("<h1>Web-Optimize</h1>");
+            try {
+                solution = instance.run();
+                out.println("<h3>🎉最適解が見つかりました🎉</h3>");
+                out.println("<br>");
+
+                for (int i = 0; i < solution.size(); i++) {
+                    out.println("\\(");
+                    out.println("x_{" + (i + 1) + "} = " + solution.getValue(i));
+                    out.println("\\)");
+                    out.println("<br>");
+                }
+            } catch (UnboundedException ex) {
+                out.println("<h3>🚨️非有界です🚨️</h3>");
+            } catch (UnfeasibleException ex) {
+                out.println("<h3>🚨️原点が実行不能です🚨<br>二段階単体法は未実装です</h3>");
+            } finally {
+                out.println("</body>");
+                out.println("</html>");
+                out.close();
+            }
+
+        } catch (IllegalArgumentException ex) {
+            request.setAttribute("ex", ex);
+            request.getRequestDispatcher("input.jsp").include(request, response);
         }
     }
 

@@ -1,8 +1,21 @@
-/* 
-    Created on : 2021/07/09, 2:37:55
-    Author     : Kota
-*/
+* {
+    font-family: sans-serif;
+}
 
 body {
     text-align: center;
 }
+
+.text {
+    width: 40px;
+}
+
+.button {
+    width: 100px;
+    height: 40px;
+}
+
+.error {
+    color: red;
+}
+
