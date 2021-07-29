@@ -116,11 +116,17 @@ public class CalculationServlet extends HttpServlet {
                 solution = instance.run();
                 out.println("<h3>🎉最適解が見つかりました🎉</h3>");
                 out.println("<br>");
-                out.println(solution.toString());
+
+                for (int i = 0; i < solution.size(); i++) {
+                    out.println("\\(");
+                    out.println("X_{" + (i + 1) + "} = " + solution.getValue(i));
+                    out.println("\\)");
+                    out.println("<br>");
+                }
             } catch (UnboundedException ex) {
-                out.println("<h3>⚠️非有界です⚠️</h3>");
+                out.println("<h3>🚨️非有界です🚨️</h3>");
             } catch (UnfeasibleException ex) {
-                out.println("<h3>⚠️原点が実行不能です⚠️<br>二段階単体法は未実装です</h3>");
+                out.println("<h3>🚨️原点が実行不能です🚨<br>二段階単体法は未実装です</h3>");
             } finally {
                 out.println("</body>");
                 out.println("</html>");
