@@ -1,17 +1,17 @@
 package jp.ac.u_tokyo.iis.space.web.optimize;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import jp.ac.u_tokyo.iis.space.optimization.algorithm.SimplexMethod;
 import jp.ac.u_tokyo.iis.space.optimization.boundary.NonnegativeCondition;
-import jp.ac.u_tokyo.iis.space.optimization.equation.EquationSymbol;
 import jp.ac.u_tokyo.iis.space.optimization.constraint.LinearConstraint;
+import jp.ac.u_tokyo.iis.space.optimization.equation.EquationSymbol;
 import jp.ac.u_tokyo.iis.space.optimization.equation.LinearEquation;
 import jp.ac.u_tokyo.iis.space.optimization.exception.UnboundedException;
 import jp.ac.u_tokyo.iis.space.optimization.exception.UnfeasibleException;
@@ -114,13 +114,13 @@ public class CalculationServlet extends HttpServlet {
             out.println("<h1>Web-Optimize</h1>");
             try {
                 solution = instance.run();
-                out.println("<h3>最適解が見つかりました</h3>");
+                out.println("<h3>🎉最適解が見つかりました🎉</h3>");
                 out.println("<br>");
                 out.println(solution.toString());
             } catch (UnboundedException ex) {
-                out.println("<h3>非有界です。</h3>");
+                out.println("<h3>⚠️非有界です⚠️</h3>");
             } catch (UnfeasibleException ex) {
-                out.println("<h3>原点が実行不能です。</h3>");
+                out.println("<h3>⚠️原点が実行不能です⚠️<br>二段階単体法は未実装です</h3>");
             } finally {
                 out.println("</body>");
                 out.println("</html>");
