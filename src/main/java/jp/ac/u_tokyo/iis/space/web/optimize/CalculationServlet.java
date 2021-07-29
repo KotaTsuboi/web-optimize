@@ -40,6 +40,17 @@ public class CalculationServlet extends HttpServlet {
         int n = 0;
         int m = 0;
 
+        boolean isMaximize;
+        String type = request.getParameter("type");
+
+        if (type.equals("maximize")) {
+            isMaximize = true;
+        } else if (type.equals("minimize")) {
+            isMaximize = false;
+        } else {
+            throw new IllegalArgumentException("Type " + type + " is undefined.");
+        }
+
         while (paramNames.hasMoreElements()) {
             String paramName = paramNames.nextElement();
             if (paramName.contains("cost")) {
@@ -92,7 +103,7 @@ public class CalculationServlet extends HttpServlet {
             NonnegativeCondition boundary = new NonnegativeCondition(variableIndexes);
 
             LinearConstraint linearConstraint = new LinearConstraint(linearEquations);
-            LinearProgrammingProblem standardForm = new LinearProgrammingProblem(true, linearFunction, linearConstraint, boundary);
+            LinearProgrammingProblem standardForm = new LinearProgrammingProblem(isMaximize, linearFunction, linearConstraint, boundary);
             System.out.println((standardForm.toStandardForm().toString()));
             SimplexMethod instance = new SimplexMethod(standardForm);
             AbstractContinuousSolution solution;
@@ -119,7 +130,7 @@ public class CalculationServlet extends HttpServlet {
 
                 for (int i = 0; i < solution.size(); i++) {
                     out.println("\\(");
-                    out.println("X_{" + (i + 1) + "} = " + solution.getValue(i));
+                    out.println("x_{" + (i + 1) + "} = " + solution.getValue(i));
                     out.println("\\)");
                     out.println("<br>");
                 }
@@ -133,7 +144,7 @@ public class CalculationServlet extends HttpServlet {
                 out.close();
             }
 
-        } catch (NumberFormatException ex) {
+        } catch (IllegalArgumentException ex) {
             request.setAttribute("ex", ex);
             request.getRequestDispatcher("input.jsp").include(request, response);
         }

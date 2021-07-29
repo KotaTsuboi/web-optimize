@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="style.css"/>
-        <script type="text/javascript" async 
+        <script type="text/javascript" async
                 src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
         </script>
         <meta name="viewport" content="width=device-width,user-scalable=no,maximum-scale=1"/>
@@ -29,7 +29,7 @@
             <p>
                 <select name="type">
                     <option value="maximize">MAXIMIZE</option>
-                    <option value="maximize">MINIMIZE</option>
+                    <option value="minimize">MINIMIZE</option>
                 </select>
             </p>
             <p>
