@@ -47,23 +47,30 @@
                 var yaxis = myPlot._fullLayout.yaxis;
                 var l = myPlot._fullLayout.margin.l;
                 var t = myPlot._fullLayout.margin.t;
+                myPlot.addEventListener('touchstart', {xaxis: xaxis, yaxis: yaxis, l: l, t: t, handleEvent: createPoint2});
+                myPlot.addEventListener('click', {xaxis: xaxis, yaxis: yaxis, l: l, t: t, handleEvent: createPoint});
+            }
 
-                myPlot.addEventListener('click', function (evt) {
-                    var xInDataCoord = xaxis.p2c(evt.layerX - l);
-                    var yInDataCoord = yaxis.p2c(evt.layerY - t);
+            function createPoint(evt) {
+                var xInDataCoord = this.xaxis.p2c(evt.layerX - this.l);
+                var yInDataCoord = this.yaxis.p2c(evt.layerY - this.t);
 
-                    var point = {
-                        x: [xInDataCoord],
-                        y: [yInDataCoord],
-                        type: 'scatter',
-                        mode: 'markers',
-                        marker: {size: 20},
-                        name: 'point'
-                    }
+                var point = {
+                    x: [xInDataCoord],
+                    y: [yInDataCoord],
+                    type: 'scatter',
+                    mode: 'markers',
+                    marker: {size: 20},
+                    name: 'point'
+                }
 
-                    data.push(point);
-                    Plotly.redraw('myDiv');
-                });
+                data.push(point);
+                Plotly.redraw('myDiv');
+            }
+
+            function createPoint2(evt) {
+                evt.preventDefault();
+                createPoint(evt);
             }
 
             function getData() {
