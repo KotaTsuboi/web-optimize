@@ -30,7 +30,21 @@ public class TSPServlet extends HttpServlet {
             throws ServletException, IOException {
         String[] x = request.getParameter("x").split(",");
         String[] y = request.getParameter("y").split(",");
+
+        if (x == null) {
+            String destination = "tsp-input.jsp";
+            RequestDispatcher dispatcher = request.getRequestDispatcher(destination);
+            dispatcher.forward(request, response);
+        }
+
         final int N = x.length;
+
+        if (N < 3) {
+            String destination = "tsp-input.jsp";
+            RequestDispatcher dispatcher = request.getRequestDispatcher(destination);
+            dispatcher.forward(request, response);
+        }
+
         double[][] xyList = new double[N][2];
 
         for (int i = 0; i < N; i++) {
