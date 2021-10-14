@@ -8,6 +8,14 @@
         <servlet-name>CalculationServlet</servlet-name>
         <url-pattern>/CalculationServlet</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>TSPServlet</servlet-name>
+        <servlet-class>jp.ac.u_tokyo.iis.space.web.optimize.TSPServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TSPServlet</servlet-name>
+        <url-pattern>/TSPServlet</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30

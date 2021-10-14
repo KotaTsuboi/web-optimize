@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    </head>
+
+    <body>
+        <div id="myDiv" style="align: center; width:100%; height: 100%;">
+            <!-- Plotly chart will be drawn here -->
+        </div>
+        <a onclick="execGet('TSPServlet', getData());return false;" href="#">GET</a>
+        <script>
+            var myPlot = document.getElementById('myDiv');
+            x = [];
+            y = [];
+            data = [{
+                    x: x,
+                    y: y,
+                    type: 'scatter',
+                    mode: 'markers',
+                    marker: {size: 20},
+                    name: 'point'
+                }];
+            /*
+             order = [0, 2, 3, 1, 4];
+             for (var i = 0; i < order.length; i++) {
+             var line = {
+             x: [x[order[i]], x[order[i + 1 % order.length]]],
+             y: [y[order[i]], y[order[i + 1 % order.length]]],
+             mode: 'lines',
+             line: {
+             width: 1, color: 'red'
+             },
+             opacity: 1.0
+             }
+
+             data.push(line);
+             }
+             */
+
+            layout = {
+                hovermode: 'closest',
+                height: 1000,
+                xaxis: {
+                    range: [0, 1],
+                    linecolor: 'black',
+                    linewidth: 2,
+                    mirror: true,
+                    showgrid: false
+                },
+                yaxis: {
+                    range: [0, 1],
+                    linecolor: 'black',
+                    linewidth: 2,
+                    mirror: true,
+                    showgrid: false,
+                },
+                showlegend: false
+            };
+
+            Plotly.plot('myDiv', data, layout)
+                    .then(attach);
+
+            function attach() {
+                var xaxis = myPlot._fullLayout.xaxis;
+                var yaxis = myPlot._fullLayout.yaxis;
+                var l = myPlot._fullLayout.margin.l;
+                var t = myPlot._fullLayout.margin.t;
+
+                myPlot.addEventListener('click', function (evt) {
+                    var xInDataCoord = xaxis.p2c(evt.x - l);
+                    var yInDataCoord = yaxis.p2c(evt.y - t);
+
+                    var point = {
+                        x: [xInDataCoord],
+                        y: [yInDataCoord],
+                        type: 'scatter',
+                        mode: 'markers',
+                        marker: {size: 20},
+                        name: 'point'
+                    }
+
+                    data.push(point);
+                    Plotly.redraw('myDiv');
+                });
+            }
+
+            function getData() {
+                return {"data": data};
+            }
+
+            /**
+             * @param String アクション
+             * @param Object GETデータ連想配列
+             * 記述元Webページ http://fujiiyuuki.blogspot.jp/2010/09/formjspost.html
+             */
+            function execGet(action, data) {
+                var form = document.createElement("form");
+                form.setAttribute("action", action);
+                form.setAttribute("method", "get");
+                form.style.display = "none";
+                document.body.appendChild(form);
+                if (data !== undefined) {
+                    for (var paramName in data) {
+                        var input = document.createElement('input');
+                        input.setAttribute('type', 'hidden');
+                        input.setAttribute('name', paramName);
+                        input.setAttribute('value', data[paramName]);
+                        form.appendChild(input);
+                    }
+                }
+                form.submit();
+            }
+
+        </script>
+    </body>
+</html>

@@ -11,13 +11,14 @@ import javax.servlet.http.HttpServletResponse;
 import jp.ac.u_tokyo.iis.space.optimization.algorithm.SimplexMethod;
 import jp.ac.u_tokyo.iis.space.optimization.boundary.NonnegativeCondition;
 import jp.ac.u_tokyo.iis.space.optimization.constraint.LinearConstraint;
-import jp.ac.u_tokyo.iis.space.optimization.equation.EquationSymbol;
 import jp.ac.u_tokyo.iis.space.optimization.equation.LinearEquation;
 import jp.ac.u_tokyo.iis.space.optimization.exception.UnboundedException;
 import jp.ac.u_tokyo.iis.space.optimization.exception.UnfeasibleException;
 import jp.ac.u_tokyo.iis.space.optimization.function.LinearFunction;
+import jp.ac.u_tokyo.iis.space.optimization.orientation.Orientation;
 import jp.ac.u_tokyo.iis.space.optimization.problem.LinearProgrammingProblem;
-import jp.ac.u_tokyo.iis.space.optimization.solution.AbstractContinuousSolution;
+import jp.ac.u_tokyo.iis.space.optimization.solution.ContinuousSolution;
+import jp.ac.u_tokyo.iis.space.optimization.symbol.EquationSymbol;
 
 /**
  *
@@ -40,13 +41,13 @@ public class CalculationServlet extends HttpServlet {
         int n = 0;
         int m = 0;
 
-        boolean isMaximize;
+        Orientation orientation;
         String type = request.getParameter("type");
 
         if (type.equals("maximize")) {
-            isMaximize = true;
+            orientation = Orientation.MAXIMIZE;
         } else if (type.equals("minimize")) {
-            isMaximize = false;
+            orientation = Orientation.MINIMIZE;
         } else {
             throw new IllegalArgumentException("Type " + type + " is undefined.");
         }
@@ -103,10 +104,10 @@ public class CalculationServlet extends HttpServlet {
             NonnegativeCondition boundary = new NonnegativeCondition(variableIndexes);
 
             LinearConstraint linearConstraint = new LinearConstraint(linearEquations);
-            LinearProgrammingProblem standardForm = new LinearProgrammingProblem(isMaximize, linearFunction, linearConstraint, boundary);
+            LinearProgrammingProblem standardForm = new LinearProgrammingProblem(orientation, linearFunction, linearConstraint, boundary);
             System.out.println((standardForm.toStandardForm().toString()));
             SimplexMethod instance = new SimplexMethod(standardForm);
-            AbstractContinuousSolution solution;
+            ContinuousSolution solution;
 
             response.setContentType("text/html;charset=UTF-8");
 
@@ -124,7 +125,7 @@ public class CalculationServlet extends HttpServlet {
             out.println("<body>");
             out.println("<h1>Web-Optimize</h1>");
             try {
-                solution = instance.run();
+                solution = instance.solve();
                 out.println("<h3>🎉最適解が見つかりました🎉</h3>");
                 out.println("<br>");
 
