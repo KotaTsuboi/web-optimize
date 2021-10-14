@@ -16,7 +16,8 @@ input.button {
 }
 
 a.button {
-    font-size: 48pt;
+    font-size: 36pt;
+    text-decoration: none;
 }
 
 h1 a {
