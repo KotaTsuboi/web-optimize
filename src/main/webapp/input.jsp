@@ -8,11 +8,11 @@
                 src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
         </script>
         <meta name="viewport" content="width=device-width,user-scalable=no,maximum-scale=1"/>
-        <title>Web-Optimize</title>
+        <title>Web Optimize</title>
     </head>
     <body>
-        <h1>Web-Optimize</h1>
-        <h3>線形計画問題を設定してください</h3>
+        <h1><a href="<%= request.getContextPath()%>">Web Optimize</a></h1>
+        <h3>Set Linear Programming Problem</h3>
         <%
             int n = 0;
             int m = 0;

@@ -1,42 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <title>Web Optimize</title>
+        <link rel="stylesheet" href="style.css"/>
     </head>
 
     <body>
+        <h1><a href="<%= request.getContextPath()%>">Web Optimize</a></h1>
+        <h3>Click to Create Points</h3>
+
         <div id="myDiv" style="align: center; width:100%; height: 100%;">
             <!-- Plotly chart will be drawn here -->
         </div>
-        <a onclick="execGet('TSPServlet', getData());return false;" href="#">GET</a>
+        <a onclick="execGet('TSPServlet', getData());return false;" href="#" class="button">START</a>
         <script>
             var myPlot = document.getElementById('myDiv');
-            x = [];
-            y = [];
-            data = [{
-                    x: x,
-                    y: y,
-                    type: 'scatter',
-                    mode: 'markers',
-                    marker: {size: 20},
-                    name: 'point'
-                }];
-            /*
-             order = [0, 2, 3, 1, 4];
-             for (var i = 0; i < order.length; i++) {
-             var line = {
-             x: [x[order[i]], x[order[i + 1 % order.length]]],
-             y: [y[order[i]], y[order[i + 1 % order.length]]],
-             mode: 'lines',
-             line: {
-             width: 1, color: 'red'
-             },
-             opacity: 1.0
-             }
-
-             data.push(line);
-             }
-             */
+            data = [];
 
             layout = {
                 hovermode: 'closest',
@@ -69,7 +50,7 @@
 
                 myPlot.addEventListener('click', function (evt) {
                     var xInDataCoord = xaxis.p2c(evt.x - l);
-                    var yInDataCoord = yaxis.p2c(evt.y - t);
+                    var yInDataCoord = yaxis.p2c(evt.y - t - 140);
 
                     var point = {
                         x: [xInDataCoord],
@@ -86,14 +67,15 @@
             }
 
             function getData() {
-                return {"data": data};
+                var xList = data.map(function (value, index, data) {
+                    return value.x;
+                });
+                var yList = data.map(function (value, index, data) {
+                    return value.y;
+                });
+                return {x: xList, y: yList};
             }
 
-            /**
-             * @param String アクション
-             * @param Object GETデータ連想配列
-             * 記述元Webページ http://fujiiyuuki.blogspot.jp/2010/09/formjspost.html
-             */
             function execGet(action, data) {
                 var form = document.createElement("form");
                 form.setAttribute("action", action);

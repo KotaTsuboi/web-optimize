@@ -120,13 +120,13 @@ public class CalculationServlet extends HttpServlet {
             out.println("src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML\">");
             out.println("</script>");
             out.println("<meta name=\"viewport\" content=\"width=device-width,user-scalable=no,maximum-scale=1\"/>");
-            out.println("<title>Web-Optimize</title>");
+            out.println("<title>Web Optimize</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Web-Optimize</h1>");
+            out.println("<h1><a href=" + request.getContextPath() + ">Web Optimize</a></h1>");
             try {
                 solution = instance.solve();
-                out.println("<h3>🎉最適解が見つかりました🎉</h3>");
+                out.println("<h3>🎉Optimal Solution was Found🎉</h3>");
                 out.println("<br>");
 
                 for (int i = 0; i < solution.size(); i++) {
@@ -136,9 +136,9 @@ public class CalculationServlet extends HttpServlet {
                     out.println("<br>");
                 }
             } catch (UnboundedException ex) {
-                out.println("<h3>🚨️非有界です🚨️</h3>");
+                out.println("<h3>🚨️Unbounded Problem🚨️</h3>");
             } catch (UnfeasibleException ex) {
-                out.println("<h3>🚨️原点が実行不能です🚨<br>二段階単体法は未実装です</h3>");
+                out.println("<h3>🚨️Origin Point is Unfeasible🚨<br>Two-phase Simplex Method is not Supported</h3>");
             } finally {
                 out.println("</body>");
                 out.println("</html>");
