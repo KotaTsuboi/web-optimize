@@ -49,8 +49,8 @@
                 var t = myPlot._fullLayout.margin.t;
 
                 myPlot.addEventListener('click', function (evt) {
-                    var xInDataCoord = xaxis.p2c(evt.x - l);
-                    var yInDataCoord = yaxis.p2c(evt.y - t - 140);
+                    var xInDataCoord = xaxis.p2c(evt.layerX - l);
+                    var yInDataCoord = yaxis.p2c(evt.layerY - t);
 
                     var point = {
                         x: [xInDataCoord],
